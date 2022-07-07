@@ -112,7 +112,49 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 
 	@Override
 	public WarehouseObject addToDatabase(WarehouseObject warehouseObject) {
-		// TODO Auto-generated method stub
+		
+		//slotId not required, as it is auto-incremented.
+		//TODO Display slotId to user, as they need it to identify it later.
+		String sql = "INSERT INTO warehouse1(spaceRequired,description,type) VALUES(?,?,?)";
+		
+		try (Connection conn = WarehouseDatabaseCredentials.getInstance().getConnection()) {
+			
+			//Start a transaction.
+			conn.setAutoCommit(false);
+			
+			PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			
+			//TODO Add validation. Don't want to save gibberish into the database.
+			ps.setFloat(1, warehouseObject.getSpaceRequired());
+			ps.setString(2, warehouseObject.getDescription());
+			ps.setString(3, warehouseObject.getType());
+			
+			int rowsAffected = ps.executeUpdate();
+			
+			if (rowsAffected != 0) {
+				
+				ResultSet keys = ps.getGeneratedKeys();
+				
+				if (keys.next()) {
+					
+					//Assign the slotId to the warehouse object.
+					warehouseObject.setSlotId(keys.getInt(1));
+					conn.commit();
+					return warehouseObject;
+				} else { //TODO Consider changing to throwing SQLException?
+					System.err.println("Error: Query added a new object but did not return a key.");
+					conn.rollback();
+				}
+				
+			} else {
+				System.err.println("Error: Query did not add a new object to the database.");
+				conn.rollback();
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 
