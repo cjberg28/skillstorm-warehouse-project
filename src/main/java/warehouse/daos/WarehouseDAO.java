@@ -12,6 +12,6 @@ public interface WarehouseDAO {
 	public void update(WarehouseObject warehouseObject);
 	public void delete(WarehouseObject warehouseObject);
 	public void delete(int slotId);
-	public void deleteMany(int[] slotIds);
-	public void deleteMany(WarehouseObject[] warehouseObjects);
+//	public void deleteMany(int[] slotIds);
+//	public void deleteMany(WarehouseObject[] warehouseObjects);
 }
