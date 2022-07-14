@@ -6,5 +6,5 @@
   <display-name>Archetype Created Web Application</display-name>
   <welcome-file-list>
     <welcome-file>../../../../warehouse-app/src/index.html</welcome-file>
-  </welcome-file-list
+  </welcome-file-list>
 </web-app>

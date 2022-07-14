@@ -1,4 +1,4 @@
-package warehouse.servlets;
+package warehouse.filters;
 
 import java.io.IOException;
 
