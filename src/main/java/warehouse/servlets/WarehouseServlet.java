@@ -1,6 +1,7 @@
 package warehouse.servlets;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -15,7 +16,7 @@ import warehouse.daos.WarehouseDAO;
 import warehouse.daos.WarehouseDAOImplementation;
 import warehouse.models.WarehouseObject;
 
-@WebServlet(urlPatterns="/*")//TODO Change to appropriate URL's.
+@WebServlet(urlPatterns="/add")//TODO Change to appropriate URL's.
 public class WarehouseServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2616722407793908813L;
@@ -37,7 +38,10 @@ public class WarehouseServlet extends HttpServlet {
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		InputStream reqBody = req.getInputStream();
+		WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
 		
+		warehouseObject = dao.addToDatabase(warehouseObject); //If the ID changed.
 	}
 	
 	@Override
