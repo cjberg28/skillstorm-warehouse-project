@@ -216,6 +216,7 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 				conn.commit();
 			} else {
 				System.err.println("Could not update object in database. (DAOImp.update())");
+				//TODO Throw an exception after rollback instead?
 				conn.rollback();
 			}
 			

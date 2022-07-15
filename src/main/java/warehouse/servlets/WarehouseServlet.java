@@ -95,13 +95,12 @@ public class WarehouseServlet extends HttpServlet {
 		InputStream reqBody = req.getInputStream();
 		WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
 		
-		dao.update(warehouseObject);
-		
-		
+		dao.update(warehouseObject);//Must assume this object is valid, unless it throws an exception.
+		//TODO Write updated object back or write an error?
 	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+		//TODO Delete, write success message back or an error.
 	}
 }
