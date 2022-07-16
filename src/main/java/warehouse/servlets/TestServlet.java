@@ -14,9 +14,7 @@ public class TestServlet extends HttpServlet {
 	private static final long serialVersionUID = 7259527207691606764L;
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// 1. Send the message itself
-		// 2. Redirect them to the HTML page
-		System.out.println("Hello Servlet!");
+		//Redirect them to the HTML page
 		resp.sendRedirect("/warehouse-project-berg");
 	}
 }

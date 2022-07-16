@@ -14,9 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import warehouse.daos.WarehouseDAO;
 import warehouse.daos.WarehouseDAOImplementation;
-import warehouse.models.NotFound;
+import warehouse.models.JSONResultMessage;
 import warehouse.models.WarehouseObject;
 
+
+//TODO These should be separated and made into 4 different servlets. Will do if extra time.
 @WebServlet(urlPatterns= {"/add/*","/delete/*","/update/*","/find/*"})
 public class WarehouseServlet extends HttpServlet {
 
@@ -75,32 +77,99 @@ public class WarehouseServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		InputStream reqBody = req.getInputStream();
-		WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
-		
-		warehouseObject = dao.addToDatabase(warehouseObject); //If the ID changed.
-		
-		if (warehouseObject != null) {
-			resp.setContentType("application/json");
-			resp.getWriter().print(mapper.writeValueAsString(warehouseObject));
-			resp.setStatus(201); // The default is 200. 201 is success - new object created.
-		} else {
+		try {
+			InputStream reqBody = req.getInputStream();
+			WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
+			float spaceRemaining = dao.getRemainingSpace();
+			
+			if (warehouseObject.getSpaceRequired() > spaceRemaining) {
+				throw new IllegalArgumentException("New object to be added would go over maximum capacity.");
+			}
+			
+			warehouseObject = dao.addToDatabase(warehouseObject); //If the ID changed.
+			
+			if (warehouseObject != null) {
+				resp.setContentType("application/json");
+				resp.getWriter().print(mapper.writeValueAsString(warehouseObject));
+				resp.setStatus(201); // The default is 200. 201 is success - new object created.
+			} else {
+				resp.setStatus(400);
+				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Addition to warehouse failed - Object has missing or invalid parameters.")));
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			resp.setStatus(400);
-			resp.getWriter().print(mapper.writeValueAsString(new NotFound("Unable to create warehouse object.")));
+			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Addition to warehouse failed - Object addition would exceed maximum capacity.")));
 		}
 	}
 	
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		InputStream reqBody = req.getInputStream();
-		WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
-		
-		dao.update(warehouseObject);//Must assume this object is valid, unless it throws an exception.
-		//TODO Write updated object back or write an error?
+		try {
+			InputStream reqBody = req.getInputStream();
+			WarehouseObject warehouseObject = mapper.readValue(reqBody, WarehouseObject.class);
+			float spaceRemaining = dao.getRemainingSpace();
+			
+			//Could be null if user tried updating an object but entered a 0 or negative slotId.
+			//Could also be null if the object doesn't exist in the warehouse.
+			WarehouseObject oldWarehouseObject = dao.findBySlotId(warehouseObject.getSlotId());
+			if (oldWarehouseObject == null) {
+				throw new IllegalArgumentException("oldWarehouseObject is null");
+			}
+			
+			//If proposed new object space - current object space > space remaining
+			//i.e., by updating the object, you would be needing more space than capacity allows for
+			if (warehouseObject.getSpaceRequired() - oldWarehouseObject.getSpaceRequired() > spaceRemaining) {
+				throw new Exception("Updated space exceeds maximum capacity.");
+			}
+			
+			boolean updateSuccessful = dao.update(warehouseObject);//Flag for update attempt.
+			if (updateSuccessful) {//Successful update.
+				resp.setContentType("application/json");//Necessary?
+				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update successful.")));
+				resp.setStatus(200);
+			} else {
+				resp.setStatus(500);
+				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - Something went wrong.")));
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			resp.setStatus(400);
+			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - The object may not exist in the warehouse, "
+					+ "or the information may be entered incorrectly.")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			resp.setStatus(400);
+			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - Proposed new space required for the object would exceed maximum capacity.")));
+		}
 	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		//TODO Delete, write success message back or an error.
+		//Deletion URL request: 8080/warehouse-project-berg/delete/{slotId}
+		String url = req.getPathInfo();
+		String[] splitString = url.split("/");//["","{slotId}"]
+		String type = splitString[1];
+		Integer id = null;
+		
+		try {
+			id = Integer.parseInt(type);
+		} catch (NumberFormatException e) {
+			//Invalid deletion request.
+		}
+		
+		if (id == null) {
+			resp.setStatus(400);
+			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion failed - Invalid URL path provided.")));
+		} else {
+			boolean deleteSuccessful = dao.delete(id);
+			if (deleteSuccessful) {
+				resp.setStatus(200);
+				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion successful.")));
+			} else {//slotId is valid, but object doesn't exist in warehouse.
+				resp.setStatus(400);
+				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion failed - Object does not exist in warehouse.")));
+			}
+		}
 	}
 }

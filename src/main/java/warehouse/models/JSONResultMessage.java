@@ -1,14 +1,14 @@
 package warehouse.models;
 
-public class NotFound {
+public class JSONResultMessage {
 
 	private String message;
 	
-	public NotFound() {
+	public JSONResultMessage() {
 		
 	}
 	
-public NotFound(String message) {
+	public JSONResultMessage(String message) {
 		this.message = message;
 	}
 	

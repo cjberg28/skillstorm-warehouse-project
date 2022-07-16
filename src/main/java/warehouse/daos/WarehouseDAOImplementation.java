@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import warehouse.config.WarehouseDatabaseCredentials;
+import warehouse.config.WarehouseSpace;
 import warehouse.models.WarehouseObject;
 
 public class WarehouseDAOImplementation implements WarehouseDAO {
@@ -191,9 +192,10 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 	 * Updates a warehouse object.
 	 * Assumptions: The warehouse object argument has a slotId.
 	 * @param warehouseObject (WarehouseObject; the object being updated, with new information)
+	 * @return Result of update attempt. True if updated successfully.
 	 */
 	@Override
-	public void update(WarehouseObject warehouseObject) {
+	public boolean update(WarehouseObject warehouseObject) {
 		String sql = "UPDATE warehouse1 SET spaceRequired = ?, description = ?, type = ? WHERE slotId = ?";
 		
 		try (Connection conn = WarehouseDatabaseCredentials.getInstance().getConnection()) {
@@ -214,9 +216,9 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 			
 			if (rowsAffected != 0) {
 				conn.commit();
+				return true;
 			} else {
 				System.err.println("Could not update object in database. (DAOImp.update())");
-				//TODO Throw an exception after rollback instead?
 				conn.rollback();
 			}
 			
@@ -225,16 +227,17 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
-		
+		return false;
 	}
 
 	/**
 	 * Deletes a warehouse object.
 	 * Assumptions: The warehouse object argument has a slotId.
 	 * @param warehouseObject (WarehouseObject; the object being deleted)
+	 * @return Result of deletion attempt. True if deleted successfully.
 	 */
 	@Override
-	public void delete(WarehouseObject warehouseObject) {
+	public boolean delete(WarehouseObject warehouseObject) {
 		String sql = "DELETE FROM warehouse1 WHERE slotId = ?";
 		
 		try (Connection conn = WarehouseDatabaseCredentials.getInstance().getConnection()) {
@@ -252,6 +255,7 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 			
 			if (rowsAffected != 0) {
 				conn.commit();
+				return true;
 			} else {
 				System.err.println("Object failed to be deleted. (DAOImp.delete(wObj))");
 				conn.rollback();
@@ -262,16 +266,17 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
-		
+		return false;
 	}
 
 	/**
 	 * Deletes a warehouse object.
 	 * Assumptions: The argument slotId > 0.
 	 * @param slotId (int; the slotId of the object being deleted)
+	 * @return Result of deletion attempt. True if deleted successfully.
 	 */
 	@Override
-	public void delete(int slotId) {
+	public boolean delete(int slotId) {
 		String sql = "DELETE FROM warehouse1 WHERE slotId = ?";
 		
 		try (Connection conn = WarehouseDatabaseCredentials.getInstance().getConnection()) {
@@ -289,6 +294,7 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 			
 			if (rowsAffected != 0) {
 				conn.commit();
+				return true;
 			} else {
 				System.err.println("Object failed to be deleted. (DAOImp.delete(int))");
 				conn.rollback();
@@ -299,7 +305,28 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
+		return false;
+	}
+
+	@Override
+	public float getRemainingSpace() {
+		//COALESCE returns the first non-null value. If summing an empty table, you get null.
+		String sql = "SELECT COALESCE(SUM(spaceRequired),0) AS totalSpace FROM warehouse1";
 		
+		try (Connection conn = WarehouseDatabaseCredentials.getInstance().getConnection()) {
+			
+			Statement statement = conn.createStatement();
+			
+			ResultSet rs = statement.executeQuery(sql);
+			
+			if (rs.next()) {//Sum calculated successfully. Empty table sum will be 0.
+				return WarehouseSpace.getMaximumSpace() - rs.getFloat(1);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1f;//Some exception has occurred.
 	}
 
 //	@Override
