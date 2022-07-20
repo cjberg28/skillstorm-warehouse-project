@@ -93,12 +93,12 @@ public class WarehouseServlet extends HttpServlet {
 				resp.getWriter().print(mapper.writeValueAsString(warehouseObject));
 				resp.setStatus(201); // The default is 200. 201 is success - new object created.
 			} else {
-				resp.setStatus(400);
+				resp.setStatus(200);
 				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Addition to warehouse failed - Object has missing or invalid parameters.")));
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			resp.setStatus(400);
+			resp.setStatus(200);
 			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Addition to warehouse failed - Object addition would exceed maximum capacity.")));
 		}
 	}
@@ -129,17 +129,17 @@ public class WarehouseServlet extends HttpServlet {
 				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update successful.")));
 				resp.setStatus(200);
 			} else {
-				resp.setStatus(500);
+				resp.setStatus(200);
 				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - Something went wrong.")));
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			resp.setStatus(400);
+			resp.setStatus(200);
 			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - The object may not exist in the warehouse, "
 					+ "or the information may be entered incorrectly.")));
 		} catch (Exception e) {
 			e.printStackTrace();
-			resp.setStatus(400);
+			resp.setStatus(200);
 			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Update failed - Proposed new space required for the object would exceed maximum capacity.")));
 		}
 	}
@@ -159,15 +159,15 @@ public class WarehouseServlet extends HttpServlet {
 		}
 		
 		if (id == null) {
-			resp.setStatus(400);
-			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion failed - Invalid URL path provided.")));
+			resp.setStatus(200);
+			resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion failed - Invalid Slot ID provided.")));
 		} else {
 			boolean deleteSuccessful = dao.delete(id);
 			if (deleteSuccessful) {
 				resp.setStatus(200);
 				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion successful.")));
 			} else {//slotId is valid, but object doesn't exist in warehouse.
-				resp.setStatus(400);
+				resp.setStatus(200);
 				resp.getWriter().print(mapper.writeValueAsString(new JSONResultMessage("Deletion failed - Object does not exist in warehouse.")));
 			}
 		}

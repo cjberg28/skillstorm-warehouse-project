@@ -18,7 +18,7 @@ public class CORSFilter implements Filter {
 	//For some reason, not overriding init() and destroy() will cause every page to give a 404.
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		
+		System.out.println("CORS Filter running");
 	}
 	
 	@Override
