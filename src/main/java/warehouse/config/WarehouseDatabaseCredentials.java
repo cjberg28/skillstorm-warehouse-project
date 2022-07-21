@@ -12,6 +12,9 @@ public class WarehouseDatabaseCredentials {
 	private static WarehouseDatabaseCredentials instance;
 	private String url, username, password;
 	
+	/**
+	 * Constructor that gets access to the database.
+	 */
 	private WarehouseDatabaseCredentials() {
 		try {
 			//Always load the driver to ensure it is running.
@@ -34,6 +37,10 @@ public class WarehouseDatabaseCredentials {
 		}
 	}
 	
+	/**
+	 * Gets an instance of the Credentials singleton.
+	 * @return Access to the database.
+	 */
 	public static WarehouseDatabaseCredentials getInstance() {
 		if (instance == null) {
 			instance = new WarehouseDatabaseCredentials();
@@ -53,6 +60,11 @@ public class WarehouseDatabaseCredentials {
 		return password;
 	}
 	
+	/**
+	 * Gets a connection to the database.
+	 * @return A connection to the database.
+	 * @throws SQLException
+	 */
 	public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(url,username,password);
 	}

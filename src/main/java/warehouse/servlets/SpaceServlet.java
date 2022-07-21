@@ -21,6 +21,12 @@ public class SpaceServlet extends HttpServlet {
 	WarehouseDAO dao = new WarehouseDAOImplementation();
 	ObjectMapper mapper = new ObjectMapper();
 
+	/**
+	 * When a GET request is made to this servlet, it returns the remaining space
+	 * left in the warehouse/database.
+	 * @param req (HttpServletRequest, the Http Request)
+	 * @param resp (HttpServletResponse, the Http Response)
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		float remainingSpace = dao.getRemainingSpace();//Could be -1 if something went wrong.

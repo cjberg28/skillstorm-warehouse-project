@@ -6,6 +6,10 @@ import java.util.List;
 import warehouse.daos.WarehouseDAOImplementation;
 import warehouse.models.WarehouseObject;
 
+/**
+ * This class is simply a test file for the back end. It is not used in the
+ * final product.
+ */
 public class Driver {
 
 	public static void main(String[] args) {

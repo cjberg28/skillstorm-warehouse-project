@@ -1,5 +1,8 @@
 package warehouse.models;
-
+/**
+ * This class is used to send messages back to the front end.
+ * It can be any message, and will appear on a card with "Notice" on it.
+ */
 public class JSONResultMessage {
 
 	private String message;

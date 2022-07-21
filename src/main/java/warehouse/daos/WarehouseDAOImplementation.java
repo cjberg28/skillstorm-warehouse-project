@@ -308,6 +308,10 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 		return false;
 	}
 
+	/**
+	 * Gets the remaining space left in the database/warehouse.
+	 * @return The remaining space left in the database/warehouse.
+	 */
 	@Override
 	public float getRemainingSpace() {
 		//COALESCE returns the first non-null value. If summing an empty table, you get null.
@@ -328,17 +332,4 @@ public class WarehouseDAOImplementation implements WarehouseDAO {
 		}
 		return -1f;//Some exception has occurred.
 	}
-
-//	@Override
-//	public void deleteMany(int[] slotIds) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void deleteMany(WarehouseObject[] warehouseObjects) {
-//		// TODO Auto-generated method stub
-//		
-//	} FUNCTIONALITY NOT REQUIRED
-
 }

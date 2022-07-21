@@ -30,6 +30,8 @@ public class WarehouseServlet extends HttpServlet {
 	 * Processes the GET request for finding by slotId or finding all by type.
 	 * Get requests made by type will be in the form of a dropdown selector on the front-end UI.
 	 * So, we can assume that the string we get will be valid (if we're not searching by id instead).
+	 * @param req (HttpServletRequest, the Http Request)
+	 * @param resp (HttpServletResponse, the Http Response)
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -74,6 +76,8 @@ public class WarehouseServlet extends HttpServlet {
 	/**
 	 * Processes the POST request for warehouse objects.
 	 * Assumes the request body JSON is valid.
+	 * @param req (HttpServletRequest, the Http Request)
+	 * @param resp (HttpServletResponse, the Http Response)
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -103,6 +107,12 @@ public class WarehouseServlet extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * Processes the PUT request for warehouse objects.
+	 * Will only return JSONResultMessages.
+	 * @param req (HttpServletRequest, the Http Request)
+	 * @param resp (HttpServletResponse, the Http Response)
+	 */
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
@@ -144,6 +154,12 @@ public class WarehouseServlet extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * Processes the DELETE request for warehouse objects.
+	 * Only cares about the id.
+	 * @param req (HttpServletRequest, the Http Request)
+	 * @param resp (HttpServletResponse, the Http Response)
+	 */
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		//Deletion URL request: 8080/warehouse-project-berg/delete/{slotId}

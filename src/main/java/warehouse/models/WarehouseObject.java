@@ -1,7 +1,11 @@
 package warehouse.models;
 
 import java.sql.SQLException;
-
+/**
+ * This is a class for a generic warehouse object. It can be anything.
+ * The extra logic is essentially bubble wrap designed to not
+ * allow creation/updating of an object with invalid parameters.
+ */
 public class WarehouseObject {
 	
 	private int slotId;
